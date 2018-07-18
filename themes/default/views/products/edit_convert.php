@@ -174,6 +174,7 @@
                 }
             }
         });
+
         $("#convert_to_item").autocomplete({
             source: function (request, response) {
                 $.ajax({
@@ -248,6 +249,7 @@
                 }
             }
         });
+
         $(document).on('change', '#gift_card_no', function () {
             var cn = $(this).val() ? $(this).val() : '';
             if (cn != '') {
@@ -450,9 +452,18 @@
 														}
 													?>
 												</td>
-												<td><div class='qoh_raw text-center'><?php echo $convert_item->qoh; ?></div></td>
+                                                <td>
+                                                    <div class='qoh_raw text-center'><?php echo $this->erp->formatQuantity($convert_item->qoh); ?></div>
+                                                </td>
 												<td>
-													<input type="text" required="required" class="quantity qty_input form-control input-tip" value="<?php echo $convert_item->quantity; ?>" name="convert_from_items_qty[]" />
+                                                    <input type="text" required="required"
+                                                           class="quantity qty_input qty_to form-control input-tip"
+                                                           value="<?php echo $this->erp->formatQuantity($convert_item->quantity); ?>"
+                                                           name="convert_from_items_qty[]"/>
+                                                    <input type='hidden' required='required'
+                                                           class='quantity hidden_qty_input form-control input-tip'
+                                                           value="<?php echo $this->erp->formatQuantity($convert_item->quantity); ?>"
+                                                           name='hidden_convert_from_items_qty[]'/>
 												</td>
 												<td>
 													<i style="cursor:pointer;" title="Remove" id="1449892339552" class="fa fa-times tip pointer sldel"></i>
@@ -505,8 +516,10 @@
 												if($convert_item->status == 'add'){
 										?>
 										<tr>
-											<td><input type="hidden" value="<?php echo $convert_item->product_id; ?>" name="convert_to_items_id[]" />
-											<input type="hidden" value="<?php echo $convert_item->product_code; ?>" name="convert_to_items_code[]" />
+                                            <td><input type="hidden" value="<?php echo $convert_item->product_id; ?>"
+                                                       class='convert_to_items_id' name="convert_to_items_id[]"/>
+                                                <input type="hidden" value="<?php echo $convert_item->product_code; ?>"
+                                                       class='procodes' name="convert_to_items_code[]"/>
 											<input type="hidden" value="<?php echo $convert_item->product_name; ?>" name="convert_to_items_name[]" />
 											<?php echo $convert_item->product_name . ' (' . $convert_item->product_code . ')' ; ?>
 											</td>
@@ -530,9 +543,17 @@
 												?>
 											</td>
 											<td class='text-center'>
-												<span class='qoh_finish text-center'><?php echo $convert_item->qoh; ?></span>
+                                                <span class='qoh_finish text-center'><?php echo $this->erp->formatQuantity($convert_item->qoh); ?></span>
 											</td>
-											<td><input type="text" required="required" class="quantity form-control input-tip" value="<?php echo $convert_item->quantity; ?>" name="convert_to_items_qty[]" /></td>
+                                            <td><input type="text" required="required" id="convert_to_items_qty"
+                                                       class="quantity qty_count form-control input-tip"
+                                                       value="<?php echo $this->erp->formatQuantity($convert_item->quantity); ?>"
+                                                       name="convert_to_items_qty[]"/><input type='hidden'
+                                                                                             required='required'
+                                                                                             class='hide_quantity qty_output form-control input-tip'
+                                                                                             value="<?php echo $convert_item->quantity; ?>"
+                                                                                             name='hide_convert_to_items_qty[]'/>
+                                            </td>
 											<td><i style="cursor:pointer;" title="Remove" id="1449892339552" class="fa fa-times tip pointer sldel"></i></td>
 										</tr>
 										<?php
@@ -779,6 +800,12 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+
+        var boms_method = '<?= $Settings->boms_method?>';
+        if (boms_method == 2) {
+            $('#convert_to_items_qty').attr("readonly", true);
+        }
+
         function requireQty(){
             var result = true;
             $(".quantity").each(function(){
@@ -840,63 +867,64 @@
             $(this).parent().parent('.input-group').children('input').val(no);
             return false;
         });
-		
+
 		$(".qty_input").keyup(function(){
-				
-				var list 		  = [];	
-				var sumQty 		  = 0;	
+
+            var list = [];
+            var sumQty = 0;
 				var get 		  = 0;
 				var qtyHidden 	  = 0;
 				var curProductQty = 0;
+
 				$(".convert_to_items_id").each(function(){
 					var tr 		= $(this).parent().parent();
 					var itemid 	= tr.find(".convert_to_items_id").val();
 					var gqty 	= tr.find(".hide_quantity").val();
 					var pcode 	= tr.find(".procodes").val();
 					var obj 	= {procode:pcode,qty:gqty};
-					list.push(obj);	
-					sumQty 		= sumQty + Number(gqty);						
+                    list.push(obj);
+                    sumQty = sumQty + Number(gqty);
 				});
-				
+
 				$('.hidden_qty_input').each(function(){
 					qtyHidden 		+= parseFloat($(this).val());
 				});
 				$('.qty_to').each(function(){
 					curProductQty 	+= parseFloat($(this).val());
 				});
-				
-				var newQty 			= 0;
+
+            var newQty 			= 0;
 				if(curProductQty == "" || curProductQty == 0){
-					var i
+                    var i = 0;
+                    var temp = 0;
+
+                    if (boms_method == 2) {
+                        newQty = curProductQty / qtyHidden;
+                    }
 					$('.qty_count').each(function() {
 						var temp 	= Number(list[i].qty);
-						temp 		= 0;						
-						$(this).val(formatPurDecimal(temp));
-						i++;
-					});		
-				}
-				else
-				{
+                        var newTemp = 0;
+                        if (boms_method == 2) {
+                            newTemp = formatPurDecimal(newQty) * temp;
+                            $(this).val(formatPurDecimal(newTemp));
+                        }
+                        i++;
+                    });
+                } else {
 					if(boms_method == 2){
-						newQty 		= curProductQty / qtyHidden;	
+                        newQty = curProductQty / qtyHidden;
 					}
-					
-					$('.qty_count').each(function(i) {
+
+                    $('.qty_count').each(function(i) {
 						var temp 	= Number(list[i].qty);
 						var newTemp = 0;
 						if(boms_method == 2){
 							newTemp = formatPurDecimal(newQty)*temp;
 							$(this).val(formatPurDecimal(newTemp));
-						}			
-						
-					});		
+                        }
+                    });
 				}
-				
-				
-				
-            });	
-			
-			
+        });
     });
 	
 /***** Sikeat Remove Convert Item *****/

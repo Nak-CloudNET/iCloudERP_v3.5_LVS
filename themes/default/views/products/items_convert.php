@@ -511,10 +511,10 @@
 				$('.qty_to').each(function(){
 					curProductQty 	+= parseFloat($(this).val());
 				});
-				
+
 				var newQty 			= 0;
 				if(curProductQty == "" || curProductQty == 0){
-					var i
+                    var i;
 					$('.qty_count').each(function() {
 						var temp 	= Number(list[i].qty);
 						temp 		= 0;						
@@ -543,8 +543,8 @@
                 var tr = $(this).parent().parent();
                 var qty = tr.find(".qty_input").val();
 				var qty  = $(this).val();
-				var cost = tr.find('.cost_raw').html();
-				var total = formatMoney(cost * qty);
+                var cost = tr.find('.cost_raw').html();
+                var total = formatMoney(cost * qty);
 				tr.find('.total_raw').html(total);
 				
 				
@@ -608,14 +608,14 @@
 				
 				//============== Get Total Raw Cost ================//
 				var total_raw_cost = 0;
-				var qty_raw        = new Array();
+                var qty_raw = [];
 				var i = 0;
 				var a = 0;
 				$('.qty_input').each(function(){
 					qty_raw[i] = $(this).val();
 					i++;
 				});
-				var cost_arr	= new Array();
+                var cost_arr = [];
 				$('.cost_raw').each(function(){
 					cost_arr[a]	 = $(this).html();
 					a++;
@@ -651,7 +651,7 @@
 			var qual = 0;
 			
 			//================== Get Stock On Hand ======================//
-			var qoh  = new Array();
+            var qoh = [];
 			var i 	 = 0;
 			$('.qoh_raw').each(function(){
 				qoh[i] = $(this).html().replace(/,/g, '');
@@ -660,7 +660,7 @@
 			//========================= End ============================//
 			
 			//================== Get variants Qty ======================//
-			var option = new Array();
+            var option = [];
 			var o      = 0;
 			$('.rvariant').each(function(){
 				option[o] = $(this).find('option:selected').attr('qty');
@@ -669,7 +669,7 @@
 			//========================= End ============================//
 			
 			//================== Get Quantity Input ====================//
-			var qty  = new Array();
+            var qty = [];
 			var a 	 = 0;
 			$('.qty_input').each(function(){
 				var inputQ = $(this).val();
@@ -679,7 +679,7 @@
 			//========================= End ============================//
 			
 			//================== Comparing Quantity ====================//
-			qual = new Array();
+            qual = [];
 			$.each(qoh, function(i,value){
 				console.log(parseFloat(value) < parseFloat(qty[i]));
 				if(parseFloat(value) < parseFloat(qty[i])){
