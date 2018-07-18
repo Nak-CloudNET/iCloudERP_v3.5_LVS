@@ -156,6 +156,7 @@
 					} else {
 						$("<option />", {value: 0, text: 'n/a'}).appendTo(opt);
 						opt = opt.hide();
+
 					}
                 	rows = "<tr>"
 	        				+ "<td>	<input type='hidden' value='"+ui.item.id+"' name='convert_from_items_id[]' />"
@@ -163,6 +164,7 @@
 	        				+ " <input type='hidden' value='"+ui.item.name+"' name='convert_from_items_name[]' />"
 	        				+ ui.item.name+"("+ ui.item.code +")</td>"
                             + "<td>" + (opt.get(0).outerHTML) + "</td>"
+                        + "<td><div class='text-center qoh_raw'>" + (ui.item.qoh == undefined ? 0 : formatQuantity2(ui.item.qoh)) + "</div></td>"
 	        				+ "<td><input type='text' required='required' class='quantity form-control input-tip' value='' name='convert_from_items_qty[]' /></td>"
 	        				+ '<td><i style="cursor:pointer;" title="Remove" id="1449892339552" class="fa fa-times tip pointer sldel"></i></td>'
 						+ "</tr>";
@@ -800,7 +802,8 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-
+        $('#convert_from_items').attr('disabled', true);
+        $('#convert_to_item').attr('disabled', true);
         var boms_method = '<?= $Settings->boms_method?>';
         if (boms_method == 2) {
             $('#convert_to_items_qty').attr("readonly", true);
