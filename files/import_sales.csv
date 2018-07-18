@@ -1,0 +1,5 @@
+Date,Reference No,Project Code,Customer Code,Warehouse Code,Product Code,Expiry Date,Net Unit Price,Quantity,Variant ID,Product Discount,Product Tax,Order Discount,Shipping,Order Tax,Payment Term,Sale Status
+16/11/2017,INV-000001,CL,CUS/00001,pp,asd-0001,16/11/2018,10,5,3,5,VAT10,10%,20,VAT10,1,completed
+16/11/2017,INV-000001,CL,CUS/00001,pp,asd-0003,,10,10,,5%,VAT10,10%,20,VAT10,1,completed
+16/11/2017,INV-000002,CL,CUS/00001,pp,asd-0001,17/11/2018,10,5,3,5,VAT10,10%,20,VAT10,1,completed
+16/11/2017,INV-000002,CL,CUS/00001,pp,asd-0003,,10,10,,5%,VAT10,10%,20,VAT10,1,completed

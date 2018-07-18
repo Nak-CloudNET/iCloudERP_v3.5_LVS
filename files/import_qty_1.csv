@@ -1,0 +1,4 @@
+Code,Quantity,option_id,warehouse_id,opening_stock,cost,expiry
+c009,50,,1,1,50,4/10/2017
+KL-0001,50,,1,1,50,25/10/2017
+KL-0002,50,,1,1,50,30/10/2017

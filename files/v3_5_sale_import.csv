@@ -1,0 +1,3 @@
+Date,Reference No,Project Code,Customer Code,Warehouse Code,Product Code,Expiry Date,Net Unit Price,Quantity,Variant ID,Product Discount,Product Tax,Order Discount,Shipping,Order Tax,Payment Term,Sale Status
+21/11/2017,Opening/AR/00002,PRO/00001,CUS/00001,pp,SP-001,30/11/2017,10,1,1,2.3,VAT10,10%,20,VAT10,1,completed
+21/11/2017,Opening/AR/00002,PRO/00001,CUS/00001,pp,123ABC,30/11/2017,10,1,1,2.3,VAT10,10%,20,VAT10,1,completed

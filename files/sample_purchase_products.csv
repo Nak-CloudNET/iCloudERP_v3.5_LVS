@@ -1,0 +1,4 @@
+Product Code,Net Unit Cost,Quantity,Warehouse Code,Supplier No,Reference No,Date,Shop ID,Purchase Status,Payment Term,Payment Status,Shipping,Order Discount,Order Tax,Expiry Date,Option Id
+abc,10,250,WH1,2,REF/SAMPLE/A00001,5/30/2016 8:27,3,received,10,pending,10,5,4,5/30/2016,1
+ABC-001,10,250,WH1,2,REF/SAMPLE/A00001,5/30/2016 8:27,3,received,10,pending,10,5,4,5/30/2016,1
+abc,10,250,WH1,2,REF/SAMPLE/A00002,5/30/2016 8:27,3,received,10,pending,0,0,0,5/30/2016,1

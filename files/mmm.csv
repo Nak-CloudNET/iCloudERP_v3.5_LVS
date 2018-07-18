@@ -1,0 +1,10 @@
+﻿Code,Name,Name KH,Category Code,Unit ID,Cost,Price,Alert Quantity, Tax Rate Name,Tax Method,Subcategory Code,Product Variants Separated by |,Supplier1(No),Supplier2(No),Supplier3(No),Supplier4(No),Supplier5(No),Custom Field 1,Custom Field 2,Custom Field 3,Custom Field 4,Custom Field 5,Custom Field 6,Image,Type(standard or service)
+33301,product 1,ស្រលាញអូន,C-001,1,0,0,,,,S-001,Each=1_0.5|Case=12_6|Box=24_12,,,,,,,,,,,,no_image.png,standard
+33302,product 2,ស្រលាញអូន,C-001,1,0,0,,,,S-001,Each=1_0.5|Case=12_6|Box=24_13,,,,,,,,,,,,no_image.png,standard
+33303,product 3,ស្រលាញអូន,C-001,1,0,0,,,,S-001,Each=1_0.5|Case=12_6|Box=24_14,,,,,,,,,,,,no_image.png,standard
+33304,product 4,ស្រលាញអូន,C-001,1,0,0,,,,S-001,Each=1_0.5|Case=12_6|Box=24_15,,,,,,,,,,,,no_image.png,standard
+33305,product 5,ស្រលាញអូន,C-001,1,0,0,,,,S-001,Each=1_0.5|Case=12_6|Box=24_16,,,,,,,,,,,,no_image.png,standard
+33306,product 6,ស្រលាញអូន,C-001,1,0,0,,,,S-001,Each=1_0.5|Case=12_6|Box=24_17,,,,,,,,,,,,no_image.png,standard
+33307,product 7,ស្រលាញអូន,C-001,1,0,0,,,,S-001,Each=1_0.5|Case=12_6|Box=24_18,,,,,,,,,,,,no_image.png,standard
+33308,product 8,ស្រលាញអូន,C-001,1,0,0,,,,S-001,,,,,,,,,,,,,no_image.png,standard
+33309,product 9,ស្រលាញអូន,C-001,1,0,0,,,,S-001,,,,,,,,,,,,,no_image.png,standard
