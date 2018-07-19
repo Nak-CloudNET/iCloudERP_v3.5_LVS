@@ -90,6 +90,26 @@ class Sales_model extends CI_Model
         return FALSE;
 				 
 	}
+	
+	public function getSaleExportBySaleID($id=null, $wh=null)
+    {
+		$this->db
+			->select("sales.date,sales.order_tax_id,sales.order_discount_id,sales.saleman_by,tax_rates.code as order_tax_code,sales.reference_no,sales.order_discount,sales.shipping,sales.order_tax,sales.sale_status,sales.payment_term,c.code as customer_code,b.code as biller_code,warehouses.code as warehouse_code")
+		->join('companies c', 'c.id = sales.customer_id', 'left')
+		->join('companies b', 'b.id = sales.biller_id', 'left')
+		->join('warehouses', 'warehouses.id = sales.warehouse_id', 'left')
+		->join('tax_rates', 'tax_rates.id = sales.order_tax_id', 'left');
+		if($wh){
+			$this->db->where_in('erp_sales.warehouse_id',$wh);
+		}
+        $q = $this->db->get_where('sales', array('sales.id' => $id),1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+	
+	
 	public function getSaleExportByID($id=null, $wh=null)
     {
 		$this->db
@@ -2885,6 +2905,21 @@ class Sales_model extends CI_Model
         $q = $this->db->get_where('sale_items', array('id' => $id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
+        }
+        return FALSE;
+    }
+	
+	public function getExcelSaleItemBySaleID($id)
+    {
+		$this->db->select('sale_items.*,tax_rates.code as item_code');
+		$this->db->join('tax_rates', 'tax_rates.id = sale_items.tax_rate_id', 'left');
+        $q = $this->db->get_where('sale_items', array('sale_id' => $id));
+        if ($q->num_rows() > 0) {
+            $data = array();
+			foreach($q->result() as $row){
+				$data[] = $row;
+			}
+			return $data;
         }
         return FALSE;
     }

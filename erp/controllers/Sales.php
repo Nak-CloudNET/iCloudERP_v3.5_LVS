@@ -3510,8 +3510,15 @@ class Sales extends MY_Controller
                             $pr_discount = $discount/$item_quantity;
                         }
                     }
+					
+					if($item_code == 'channa3'){
+						//$this->erp->print_arrays($item_discount); 
+					}
+					
+					
                     $unitPrice = $unit_price;
                     $unit_price = $unit_price - $pr_discount;
+					
                     $item_net_price = $unit_price;
                     $pr_item_discount = $this->erp->formatDecimal($pr_discount * $item_quantity);
                     $product_discount += $pr_item_discount;
@@ -3563,7 +3570,7 @@ class Sales extends MY_Controller
 					}else{
 						$quantity_balance = $item_quantity;
 					}
-				
+												
                     $products[] = array(
                         'product_id' 		=> $item_id,
                         'digital_id' 		=> $digital_id,
@@ -3603,7 +3610,7 @@ class Sales extends MY_Controller
             } else {
                 krsort($products);
             }
-
+			
             if ($this->input->post('order_discount')) {
                 $order_discount_id = $this->input->post('order_discount');
                 $opos = strpos($order_discount_id, $percentage);
@@ -3616,8 +3623,8 @@ class Sales extends MY_Controller
             } else {
                 $order_discount_id = null;
             }
+			
             $total_discount = $this->erp->formatDecimal($order_discount + $product_discount);
-            //echo $this->erp->floorFigure($product_discount);die();
             if ($this->Settings->tax2) {
                 $order_tax_id = $this->input->post('order_tax');
                 if ($order_tax_details = $this->site->getTaxRateByID($order_tax_id)) {
@@ -7045,8 +7052,108 @@ class Sales extends MY_Controller
         }
     }
 	
+	function sale_actions($wh = null)
+    {
+        if($wh){
+            $wh = explode('-', $wh);
+        }
+        $this->form_validation->set_rules('form_action', lang("form_action"), 'required');
 
-    function sale_actions($wh = null)
+        if ($this->form_validation->run() == true) {
+
+            if (!empty($_POST['val'])) {
+               
+                if ($this->input->post('form_action') == 'export_excel') {
+                    if($this->Owner || $this->Admin){
+                    $this->load->library('excel');
+                    $this->excel->setActiveSheetIndex(0);
+                    $this->excel->getActiveSheet()->setTitle(lang('sales'));
+                    $this->excel->getActiveSheet()->SetCellValue('A1', lang('date'));
+                    $this->excel->getActiveSheet()->SetCellValue('B1', lang('reference_no'));
+                    $this->excel->getActiveSheet()->SetCellValue('C1', lang('project_code'));
+                    $this->excel->getActiveSheet()->SetCellValue('D1', lang('customer_code'));
+                    $this->excel->getActiveSheet()->SetCellValue('E1', lang('warehouse_code'));
+					$this->excel->getActiveSheet()->SetCellValue('F1', lang('product_code'));
+                    $this->excel->getActiveSheet()->SetCellValue('G1', lang('expiry_date'));
+                    $this->excel->getActiveSheet()->SetCellValue('H1', lang('unit_price'));
+                    $this->excel->getActiveSheet()->SetCellValue('i1', lang('net_unit_price'));
+                    $this->excel->getActiveSheet()->SetCellValue('J1', lang('quantity'));
+                    $this->excel->getActiveSheet()->SetCellValue('K1', lang('variant_id'));
+                    $this->excel->getActiveSheet()->SetCellValue('L1', lang('product_discount'));
+                    $this->excel->getActiveSheet()->SetCellValue('M1', lang('product_tax'));
+                    $this->excel->getActiveSheet()->SetCellValue('N1', lang('order_discount'));
+                    $this->excel->getActiveSheet()->SetCellValue('O1', lang('shipping'));
+                    $this->excel->getActiveSheet()->SetCellValue('P1', lang('order_tax'));
+                    $this->excel->getActiveSheet()->SetCellValue('Q1', lang('payment_term'));
+                    $this->excel->getActiveSheet()->SetCellValue('R1', lang('sale_status'));
+                    $this->excel->getActiveSheet()->SetCellValue('S1', lang('saleman_by'));
+                    $row = 2;
+                    foreach ($_POST['val'] as $id) {
+						
+                        $sale = $this->sales_model->getSaleExportBySaleID($id);
+                        $sale_items = $this->sales_model->getExcelSaleItemBySaleID($id);
+						
+						foreach($sale_items as $sale_item){
+							
+							$this->excel->getActiveSheet()->SetCellValue('A' . $row, $this->erp->hrld($sale->date));
+							$this->excel->getActiveSheet()->SetCellValue('B' . $row, $sale->reference_no);
+							$this->excel->getActiveSheet()->SetCellValue('C' . $row, $sale->biller_code);
+							$this->excel->getActiveSheet()->SetCellValue('D' . $row, $sale->customer_code);
+							$this->excel->getActiveSheet()->SetCellValue('E' . $row, $sale->warehouse_code);
+							
+							$this->excel->getActiveSheet()->SetCellValue('F' . $row, $sale_item->product_code);
+							$this->excel->getActiveSheet()->SetCellValue('G' . $row, '');
+							$this->excel->getActiveSheet()->SetCellValue('H' . $row, $sale_item->unit_price);
+							$this->excel->getActiveSheet()->SetCellValue('I' . $row, $sale_item->net_unit_price);
+							$this->excel->getActiveSheet()->SetCellValue('J' . $row, $sale_item->quantity);
+							$this->excel->getActiveSheet()->SetCellValue('K' . $row, $sale_item->option_id);
+							$this->excel->getActiveSheet()->SetCellValue('L' . $row, $sale_item->discount);
+							$this->excel->getActiveSheet()->SetCellValue('M' . $row, $sale_item->item_code);
+							
+							$this->excel->getActiveSheet()->SetCellValue('N' . $row, $sale->order_discount_id);
+							$this->excel->getActiveSheet()->SetCellValue('O' . $row, $sale->shipping);
+							$this->excel->getActiveSheet()->SetCellValue('P' . $row, $sale->order_tax_code);
+							$this->excel->getActiveSheet()->SetCellValue('Q' . $row, $sale->payment_term);
+							$this->excel->getActiveSheet()->SetCellValue('R' . $row,strip_tags($sale->sale_status));
+							$this->excel->getActiveSheet()->SetCellValue('S' . $row,strip_tags($sale->saleman_by));
+							$row++;
+						}
+						
+                    }
+					
+                }
+				
+                    $this->excel->getDefaultStyle()->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                    $filename = 'sales_' . date('Y_m_d_H_i_s');
+                    
+                    if ($this->input->post('form_action') == 'export_excel') {
+                        header('Content-Type: application/vnd.ms-excel');
+                        header('Content-Disposition: attachment;filename="' . $filename . '.xls"');
+                        header('Cache-Control: max-age=0');
+                        $styleArray = array(
+                            'font'  => array(
+                                'bold'  => true,
+                            )
+                        );
+						
+                        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
+                        return $objWriter->save('php://output');
+                    }
+
+                    redirect($_SERVER["HTTP_REFERER"]);
+                }
+            } else {
+                $this->session->set_flashdata('error', lang("no_sale_selected"));
+                redirect($_SERVER["HTTP_REFERER"]);
+            }
+        } else {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
+	
+
+    function sale_actions_old($wh = null)
     {
         if($wh){
             $wh = explode('-', $wh);
@@ -7141,6 +7248,7 @@ class Sales extends MY_Controller
                 } 
 				
                 if ($this->input->post('form_action') == 'export_excel' || $this->input->post('form_action') == 'export_pdf') {
+					
                     if($this->Owner || $this->Admin){
                     $this->load->library('excel');
                     $this->excel->setActiveSheetIndex(0);
@@ -7174,12 +7282,11 @@ class Sales extends MY_Controller
                     $this->excel->getActiveSheet()->SetCellValue('P2', lang('payment_status'));
                     $this->excel->getActiveSheet()->SetCellValue('Q2', lang('note'));
                     
-
+					
                     $row = 3;
                     $sum_grand = $balance = $sum_banlance = $sum_deposit = $sum_paid = 0;
                     foreach ($_POST['val'] as $id) {
                         $sale = $this->sales_model->getSaleExportByID($id);
-						$this->erp->print_arrays($sales);
                         $sum_amount += $sale->amount;
                         $sum_return_sale += $sale->return_sale;
                         $sum_paid += $sale->paid;
@@ -7218,6 +7325,7 @@ class Sales extends MY_Controller
                             $this->excel->getActiveSheet()->SetCellValue('O' . $new_row, $this->erp->formatMoney($sum_banlance));
                         $row++;
                     }
+					
                 }else{
                     $this->load->library('excel');
                     $this->excel->setActiveSheetIndex(0);
@@ -12808,59 +12916,50 @@ class Sales extends MY_Controller
         $this->form_validation->set_message('is_natural_no_zero', lang("no_zero_required"));
 
         if ($this->form_validation->run() == true) {
-            $quantity = "quantity";
-            $product = "product";
-            $unit_cost = "unit_cost";
-            $tax_rate = "tax_rate";
-
-            $total = 0;
-            $product_tax = 0;
-			$total_cost = 0;
-            $order_tax = 0;
-            $product_discount = 0;
-            $order_discount = 0;
-            $percentage = '%';
+            
+			
 
             if (isset($_FILES["userfile"])) {
-
                 $this->load->library('upload');
-
                 $config['upload_path'] = $this->digital_upload_path;
                 $config['allowed_types'] = 'csv';
                 $config['max_size'] = $this->allowed_file_size;
                 $config['overwrite'] = TRUE;
-
                 $this->upload->initialize($config);
-
                 if (!$this->upload->do_upload()) {
                     $error = $this->upload->display_errors();
                     $this->session->set_flashdata('error', $error);
                     redirect("sales/sale_by_csv");
                 }
+				
                 $csv = $this->upload->file_name;
                 $arrResult = array();
                 $handle = fopen($this->digital_upload_path . $csv, "r");
                 if ($handle) {
-                    while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                    while (($row = fgetcsv($handle, 0, ",")) !== FALSE) {
                         $arrResult[] = $row;
                     }
                     fclose($handle);
                 }
+				
+				
                 $titles = array_shift($arrResult);
-
-                $keys = array('date', 'reference_no', 'biller_code', 'customer_code', 'warehouse_code', 'product_code', 'expiry', 'unit_price', 'quantity', 'variant_id', 'item_discount', 'item_tax', 'order_discount', 'shipping', 'order_tax', 'payment_term', 'sale_status');
-                //$keys = array('code', 'net_unit_price', 'quantity', 'customer', 'warehouse_code' ,'reference_no', 'date', 'biller_id', 'sale_status', 'payment_term', 'payment_status', 'shipping', 'order_discount', 'order_tax');
+                $keys = array('date', 'reference_no', 'biller_code', 'customer_code', 'warehouse_code', 'product_code', 'expiry','unit_price', 'net_unit_price', 'quantity', 'variant_id', 'item_discount', 'item_tax', 'order_discount', 'shipping', 'order_tax', 'payment_term', 'sale_status','saleman_by');
                 $final = array();
+				
                 foreach ($arrResult as $key => $value) {
-                    $final[] = array_combine($keys, $value);
+					$final[] = array_combine($keys, $value);
                 }
+				//$this->erp->print_arrays($final);
+				
                 $rw = 2;
                 $bak_ref = '';
                 $old_reference = '';
 				$temp_reference = '';
 				$products = array();
 				$data = array();
-				//$this->erp->print_arrays($final);			
+				
+				
 				foreach ($final as $csv_pr) {
 					$old_reference = $csv_pr['reference_no'];
 					if($old_reference != $temp_reference) {
@@ -12870,16 +12969,31 @@ class Sales extends MY_Controller
 							foreach($temp_data as $tmp_data) {
 								if($tmp_data['reference_no'] == $csv_pr['reference_no']) {
 									$help = false;
+									
 								}
 							}
 						}
 						
 						$temp_data[] = array(
-										'reference_no' => $csv_pr['reference_no']
-									   );
+							'reference_no' => $csv_pr['reference_no']
+					    );
+						
 					
 						if($help) {
 							$total_items = 0;
+							$quantity = "quantity";
+							$product = "product";
+							$unit_cost = "unit_cost";
+							$tax_rate = "tax_rate";
+
+							$total = 0;
+							$product_tax = 0;
+							$total_cost = 0;
+							$order_tax = 0;
+							$product_discount = 0;
+							$order_discount = 0;
+							$percentage = '%';
+							
 							foreach($final as $product) {
 								if($product['reference_no'] == $csv_pr['reference_no']) {
 									if (!empty($product['product_code']) && !empty($product['unit_price']) && !empty($product['quantity'])) {
@@ -12915,22 +13029,30 @@ class Sales extends MY_Controller
 												$item_unit_quantity = 1;
 												$item_option = '';
 											}
-											if (isset($item_code) && isset($unit_price) && isset($item_quantity)) { 
+											if (isset($item_code) && isset($unit_price) && isset($item_quantity)) {
 												$product_details = $this->sales_model->getProductByCode($item_code);
+												$pr_discount = 0;
+
 												if (isset($item_discount)) {
 													$discount = $item_discount;
 													$dpos = strpos($discount, $percentage);
 													if ($dpos !== false) {
 														$pds = explode("%", $discount);
-														$pr_discount = ((($this->erp->formatDecimal($unit_price)) * (Float) ($pds[0])) / 100);
+														$pr_discount = (($unit_price * (Float) ($pds[0])) / 100);
 													} else {
-														$pr_discount = $this->erp->formatDecimal($discount/$item_quantity);
+														$pr_discount = $discount/$item_quantity;
 													}
-												} else {
-													$pr_discount = 0;
+												}
+												
+												$unitPrice = $unit_price;
+												
+												
+												if($item_code == 'channa3'){
+													//$this->erp->print_arrays($item_discount); 
 												}
 												
 												$unit_price = $this->erp->formatDecimal($unit_price - $pr_discount);
+												
 												$item_net_price = $unit_price;
 												
 												$pr_item_discount = $this->erp->formatDecimal($pr_discount * $item_quantity);
@@ -12948,6 +13070,7 @@ class Sales extends MY_Controller
 																$item_tax = ((($item_net_price) * $tax_details->rate) / (100 + $tax_details->rate));
 																$tax = $tax_details->rate . "%";
 																$item_net_price = $item_net_price - $item_tax;
+																
 															}
 														} elseif ($tax_details->type == 2) {
 
@@ -12983,6 +13106,7 @@ class Sales extends MY_Controller
 													$subtotal = (($unit_price * $item_quantity) + $pr_item_tax);
 												}
 												
+												
 												$products[] = array(
 													'product_id' 		=> $item_id,
 													'product_code' 		=> $item_code,
@@ -12990,7 +13114,7 @@ class Sales extends MY_Controller
 													'product_type' 		=> $item_type,
 													'option_id' 		=> $item_option,
 													'net_unit_price' 	=> $item_net_price,
-													'unit_price' 		=> $this->erp->formatDecimal($unit_price),
+													'unit_price' 		=> $this->erp->formatDecimal($unitPrice),
 													'quantity' 			=> $item_quantity,
 													'warehouse_id' 		=> $warehouse_id,
 													'item_tax' 			=> $pr_item_tax,
@@ -13005,6 +13129,7 @@ class Sales extends MY_Controller
 													'expiry' 			=> $this->erp->fld($expiry)
 												);
 												$total += $subtotal;
+												
 												$total_items += $item_quantity;
 											}
 										}
@@ -13014,18 +13139,20 @@ class Sales extends MY_Controller
 									}
 								}
 							}
-							//$this->erp->print_arrays($products);		
+							
+							
+
 							$date 				= strtr($csv_pr['date'], '/', '-');
 							$date 				= date('Y-m-d h:m:i', strtotime($date));
 							$reference 			= $csv_pr['reference_no'];
 							$sale_status 		= $csv_pr['sale_status'];
 							$payment_term 		= $csv_pr['payment_term'];
-							$payment_status 	= $csv_pr['payment_status'];
+							//$payment_status 	= $csv_pr['payment_status'];
 							$shipping 			= $csv_pr['shipping'];
 							$order_discount 	= $csv_pr['order_discount'];
 							$order_tax_id 		= $csv_pr['order_tax'];
 							$opening_ar 		= 0;
-
+							$saleman_by 		= $csv_pr['saleman_by'];
 							$bak_ref 			= $csv_pr['reference_no'];
 
 							$customer_code 		= $csv_pr['customer_code'];
@@ -13045,10 +13172,12 @@ class Sales extends MY_Controller
 									$order_discount = $this->erp->formatDecimal(((($total) * (Float) ($ods[0])) / 100), 4);
 								} else {
 									$order_discount = $this->erp->formatDecimal(($total * $order_discount_id) / 100);
+									
 								}
 							} else {
 								$order_discount_id = null;
 							}
+							
 							$total_discount = $this->erp->formatDecimal($order_discount + $product_discount);
 
 							if ($this->Settings->tax2) {
@@ -13067,6 +13196,7 @@ class Sales extends MY_Controller
 							$total_tax = $this->erp->formatDecimal(($product_tax + $order_tax), 4); 
 							$grand_total = $this->erp->formatDecimal(($total + $order_tax + $this->erp->formatDecimal($shipping) - $order_discount), 4);
 					
+							
 							
 							$data = array(
 								'date' 					=> $date,
